@@ -1,57 +1,58 @@
-"use strict";
-const { src, dest, series, parallel } = require("gulp");
-const gulp = require("gulp");
-const atoprefixer = require("gulp-autoprefixer");
-const cssbeautify = require("gulp-cssbeautify");
-const cssnano = require("gulp-cssnano");
-const imagemin = require("gulp-imagemin");
-const plumber = require("gulp-plumber");
-const rename = require("gulp-rename");
-const rigger = require("gulp-rigger");
-const sass = require("gulp-sass")(require("sass"));
-const removeComments = require("gulp-strip-css-comments");
-const uglify = require("gulp-uglify");
-const panini = require("panini");
-const browserSync = require("browser-sync").create();
-const del = require("del");
-const notify = require("gulp-notify");
-const autoprefixer = require("gulp-autoprefixer");
+'use strict';
+const { src, dest, series, parallel } = require('gulp');
+const gulp = require('gulp');
+const atoprefixer = require('gulp-autoprefixer');
+const cssbeautify = require('gulp-cssbeautify');
+const cssnano = require('gulp-cssnano');
+const imagemin = require('gulp-imagemin');
+const plumber = require('gulp-plumber');
+const rename = require('gulp-rename');
+const rigger = require('gulp-rigger');
+const sass = require('gulp-sass')(require('sass'));
+const removeComments = require('gulp-strip-css-comments');
+const uglify = require('gulp-uglify');
+const panini = require('panini');
+const browserSync = require('browser-sync').create();
+const del = require('del');
+const notify = require('gulp-notify');
+const autoprefixer = require('gulp-autoprefixer');
+const sourcemaps = require('gulp-sourcemaps');
 
 /*Const paths */
-const srcPath = "src/";
-const disPath = "dist/";
+const srcPath = 'src/';
+const disPath = 'dist/';
 const path = {
   build: {
     html: disPath,
-    css: disPath + "assets/css/",
-    js: disPath + "assets/js/",
-    imges: disPath + "assets/images/",
-    fonts: disPath + "assets/fonts/",
+    css: disPath + 'assets/css/',
+    js: disPath + 'assets/js/',
+    images: disPath + 'assets/images/',
+    fonts: disPath + 'assets/fonts/',
   },
   src: {
-    html: srcPath + "*.html",
-    css: srcPath + "assets/scss/*.scss",
-    js: srcPath + "assets/js/*.js",
+    html: srcPath + '*.html',
+    css: srcPath + 'assets/scss/*.scss',
+    js: srcPath + 'assets/js/*.js',
     images:
       srcPath +
-      "assets/images/**/*.{jpeg, svg, png, gif, ico, xml, joson, webp, webmanifest}",
-    fonts: srcPath + "assets/fonts/**/*.{woff, woff2, ttf, svg, eot}",
+      'assets/images/**/*.{jpg, svg, png, gif, ico, xml, json, webp, webmanifest}',
+    fonts: srcPath + 'assets/fonts/**/*.{woff, woff2, ttf, svg, eot}',
   },
   watch: {
-    html: srcPath + "**/*.html",
-    js: srcPath + "assets/js/**/*.js",
-    css: srcPath + "assets/scss/**/*.scss",
+    html: srcPath + '**/*.html',
+    js: srcPath + 'assets/js/**/*.js',
+    css: srcPath + 'assets/scss/**/*.scss',
     images:
       srcPath +
-      "assets/images/**/*.{jpeg, svg, png, gif, ico, xml, joson, webp, webmanifest}",
-    fonts: srcPath + "assets/fonts/**/*.{woff, woff2, ttf, svg, eot}",
+      'assets/images/**/*.{jpg, svg, png, gif, ico, xml, json, webp, webmanifest}',
+    fonts: srcPath + 'assets/fonts/**/*.{woff, woff2, ttf, svg, eot}',
   },
-  clean: "./" + disPath,
+  clean: './' + disPath,
 };
 
 function server() {
   browserSync.init({
-    server: { baseDir: "./" + disPath },
+    server: { baseDir: './' + disPath },
   });
 }
 function html() {
@@ -61,59 +62,61 @@ function html() {
     .pipe(
       panini({
         root: srcPath,
-        layouts: srcPath + "tpl/layouts/",
-        partials: srcPath + "tpl/partials/",
+        layouts: srcPath + 'tpl/layouts/',
+        partials: srcPath + 'tpl/partials/',
       })
     )
     .pipe(dest(path.build.html))
     .pipe(browserSync.reload({ stream: true }));
 }
 function css() {
-  return src(path.src.css, { base: srcPath + "assets/scss/" })
+  return src(path.src.css, { base: srcPath + 'assets/scss/' })
+    .pipe(sourcemaps.init())
     .pipe(
       plumber({
         errorHandler: function (err) {
           notify.onError({
-            title: "SCSS Error",
-            message: "Error: <%= error.message %>",
+            title: 'SCSS Error',
+            message: 'Error: <%= error.message %>',
           })(err);
-          this.emit("end");
+          this.emit('end');
         },
       })
     )
     .pipe(sass())
-    .pipe(autoprefixer())
+    .pipe(autoprefixer({ cascade: false }))
     .pipe(cssbeautify())
     .pipe(dest(path.build.css))
     .pipe(
       cssnano({
         zindex: false,
         discardComments: {
-          reoveAll: true,
+          removeAll: true,
         },
       })
     )
     .pipe(removeComments())
     .pipe(
       rename({
-        suffix: ".min",
-        extname: ".css",
+        suffix: '.min',
+        extname: '.css',
       })
     )
+    .pipe(sourcemaps.write('.'))
     .pipe(dest(path.build.css))
     .pipe(browserSync.reload({ stream: true }));
 }
 
 function js() {
-  return src(path.src.js, { base: srcPath + "assets/js/" })
+  return src(path.src.js, { base: srcPath + 'assets/js/' })
     .pipe(
       plumber({
         errorHandler: function (err) {
           notify.onError({
-            title: "JS Error",
-            message: "Error: <%= error.message %>",
+            title: 'JS Error',
+            message: 'Error: <%= error.message %>',
           })(err);
-          this.emit("end");
+          this.emit('end');
         },
       })
     )
@@ -122,8 +125,8 @@ function js() {
     .pipe(uglify())
     .pipe(
       rename({
-        suffix: ".min",
-        extname: ".js",
+        suffix: '.min',
+        extname: '.js',
       })
     )
     .pipe(dest(path.build.js))
@@ -131,13 +134,13 @@ function js() {
 }
 
 function images() {
-  return src(path.src.images, { base: srcPath + "assets/images/" })
+  return src(path.src.images, { base: srcPath + 'assets/images/' })
     .pipe(imagemin())
-    .pipe(dest(path.build.imges))
+    .pipe(dest(path.build.images))
     .pipe(browserSync.reload({ stream: true }));
 }
 function fonts() {
-  return src(path.src.fonts, { base: srcPath + "assets/fonts /" }).pipe(
+  return src(path.src.fonts, { base: srcPath + 'assets/fonts /' }).pipe(
     browserSync.reload({ stream: true })
   );
 }
