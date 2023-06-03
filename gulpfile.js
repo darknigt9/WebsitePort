@@ -29,14 +29,15 @@ const path = {
     images: disPath + 'assets/images/',
     fonts: disPath + 'assets/fonts/',
   },
+
   src: {
     html: srcPath + '*.html',
     css: srcPath + 'assets/scss/*.scss',
     js: srcPath + 'assets/js/*.js',
     images:
       srcPath +
-      'assets/images/**/*.{jpg, svg, png, gif, ico, xml, json, webp, webmanifest}',
-    fonts: srcPath + 'assets/fonts/**/*.{woff, woff2, ttf, svg, eot}',
+      'assets/images/**/*.{png,jpg,svg,gif,ico,xml,json,webp,webmanifest}',
+    fonts: srcPath + 'assets/fonts/**/*.{woff,woff2,ttf,svg,eot,otf}',
   },
   watch: {
     html: srcPath + '**/*.html',
@@ -44,13 +45,13 @@ const path = {
     css: srcPath + 'assets/scss/**/*.scss',
     images:
       srcPath +
-      'assets/images/**/*.{jpg, svg, png, gif, ico, xml, json, webp, webmanifest}',
-    fonts: srcPath + 'assets/fonts/**/*.{woff, woff2, ttf, svg, eot}',
+      'assets/images/**/*.{png,jpg,svg,gif,ico,xml,json,webp,webmanifest}',
+    fonts: srcPath + 'assets/fonts/**/*.{woff,woff2,ttf,svg,eot,otf}',
   },
   clean: './' + disPath,
 };
 
-function server() {
+function serve() {
   browserSync.init({
     server: { baseDir: './' + disPath },
   });
@@ -135,12 +136,21 @@ function js() {
 
 function images() {
   return src(path.src.images, { base: srcPath + 'assets/images/' })
-    .pipe(imagemin())
+    .pipe(
+      imagemin([
+        imagemin.gifsicle({ interlaced: true }),
+        imagemin.mozjpeg({ quality: 75, progressive: true }),
+        imagemin.optipng({ optimizationLevel: 5 }),
+        imagemin.svgo({
+          plugins: [{ removeViewBox: true }, { cleanupIDs: false }],
+        }),
+      ])
+    )
     .pipe(dest(path.build.images))
     .pipe(browserSync.reload({ stream: true }));
 }
 function fonts() {
-  return src(path.src.fonts, { base: srcPath + 'assets/fonts /' }).pipe(
+  return src(path.src.fonts, { base: srcPath + 'assets/fonts/' }).pipe(
     browserSync.reload({ stream: true })
   );
 }
@@ -157,12 +167,13 @@ function watchFiles() {
 }
 
 const build = series(clean, gulp.parallel(html, js, css, images, fonts));
-const watch = gulp.parallel(build, watchFiles, server);
+const watch = gulp.parallel(build, watchFiles, serve);
 
 exports.html = html;
 exports.css = css;
 exports.js = js;
 exports.images = images;
+exports.fonts = fonts;
 exports.clean = clean;
 exports.build = build;
 exports.watch = watch;

@@ -1,0 +1,40 @@
+.header {
+  // .header__navbar
+
+  &__navbar {
+    margin-top: 0.925rem;
+  }
+}
+.navbar {
+  padding-inline: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 2.5rem;
+}
+
+.menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 2.5rem;
+  text-align: center;
+  // .menu__item
+
+  &__item {
+    font-size: 1.25rem;
+  }
+
+  // .menu__link
+}
+.btn {
+  // .btn__img
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+
+  &__img {
+    color: aqua;
+    display: block;
+  }
+}

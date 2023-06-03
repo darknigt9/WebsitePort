@@ -1,0 +1,19 @@
+.burger-btn {
+  position: relative;
+  height: 2rem;
+  width: 2rem;
+  cursor: pointer;
+  .burger-btn__item {
+    position: absolute;
+    color: #0a0a0a;
+    top: 50%;
+    left: 50%;
+    // .burger-btn__item
+
+    &__item {
+    }
+    &__item::after::before {
+    }
+    content: "";
+  }
+}

@@ -1,2 +1,2 @@
 console.log(1);
-console.log(66);
+console.log(60);

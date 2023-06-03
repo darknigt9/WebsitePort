@@ -1,0 +1,34 @@
+$whiteThemeColor: rgb(242, 242, 242);
+$blackThemeColor: rgb(65, 65, 65);
+html {
+  box-sizing: border-box;
+  font-family: "DM Sans", "Josefin Sans", sans-serif;
+  font-weight: 400;
+  background-color: $whiteThemeColor;
+}
+.themeBlack {
+  background-color: $blackThemeColor;
+}
+
+*,
+*::after,
+*::before {
+  margin: 0;
+  box-sizing: inherit;
+}
+ul,
+ol {
+  padding: 0;
+  list-style-type: none;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+.container {
+  max-width: 77.5rem;
+  margin: 0 auto;
+}
+button {
+  padding: 0;
+}
